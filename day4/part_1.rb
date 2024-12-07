@@ -22,13 +22,9 @@ def find_matches(puzzle_array, row, col)
   SHIFT_COMBOS.count { |combo| check_direciton(puzzle_array, row, col, combo)}
 end
 
-count = 0
-
-puzzle_array.each_with_index do |row, row_index|
-  row.each_with_index do |value, col_index|
-    if value == TARGET_STRING_START
-      count += find_matches(puzzle_array, row_index, col_index)
-    end
+count = puzzle_array.each_with_index.sum do |row, row_index|
+  row.each_with_index.sum do |value, col_index|
+    value == TARGET_STRING_START ? find_matches(puzzle_array, row_index, col_index) : 0
   end
 end
 
