@@ -5,8 +5,7 @@ def process_page_numbers(pages, invalid_entries_map, modified = false)
 
   pages.each_with_index do |page, idx|
     # If the page is already marked as invalid, swap and reprocess
-    if invalid_page_positions.include?(page)
-      swap_idx = invalid_page_positions[page]
+    if (swap_idx = invalid_page_positions[page])
       pages[idx], pages[swap_idx] = pages[swap_idx], pages[idx]
       return process_page_numbers(pages, invalid_entries_map, true)
     end
