@@ -38,4 +38,5 @@ cache = {}
 
 stone_count = stones.sum { |stone| split_sum(stone, ITERATIONS, cache) }
 
+puts cache.size
 puts stone_count
