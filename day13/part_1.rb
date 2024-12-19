@@ -1,6 +1,5 @@
 INPUT_FILENAME = 'input.txt'
 
-
 Button = Struct.new(:x, :y)
 
 class Game
