@@ -44,10 +44,7 @@ def print_grid(robots, seconds)
 end
 
 robots = []
-
-File.foreach(INPUT_FILENAME).with_index do |line|
-  robots << Robot.new(*extract_numbers(line))
-end
+File.foreach(INPUT_FILENAME) { |line| robots << Robot.new(*extract_numbers(line)) }
 
 (1...10000).each do |i|
   robots.each { |robot| robot.move(1) }
