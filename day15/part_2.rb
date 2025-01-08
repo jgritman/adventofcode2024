@@ -68,17 +68,17 @@ class WarehouseMap
 
   def move_boxes?(row, col, direction)
     boxes_to_move = []
-    movable = false
-    if direction[0] == 0
-      movable = move_boxes_horizontal?(row, col, direction[1], boxes_to_move)
-    else
-      movable = move_boxes_vertial?(row, col, direction, boxes_to_move)
-      boxes_to_move = boxes_to_move.uniq.sort do |box_a, box_b|
-        (box_b[0] <=> box_a[0]) * -direction[0]
-      end
+    movable = direction[0].zero? ? move_boxes_horizontal?(row, col, direction[1], boxes_to_move) :
+                                    move_boxes_vertical?(row, col, direction, boxes_to_move)
+
+    # Sort the boxes if they were moved vertically
+    if direction[0] != 0
+      boxes_to_move = boxes_to_move.uniq.sort { |box_a, box_b| (box_b[0] <=> box_a[0]) * -direction[0] }
     end
+
     return false unless movable
 
+    # Move the boxes in reverse order
     boxes_to_move.reverse_each do |box_pos|
       box_char = @map_matrix[box_pos[0]][box_pos[1]]
       new_row, new_col = box_pos[0] + direction[0], box_pos[1] + direction[1]
@@ -88,17 +88,19 @@ class WarehouseMap
   end
 
   def move_boxes_horizontal?(row, col, col_shift, boxes_to_move)
-    boxes_to_move << [row, col]
-    boxes_to_move << [row, col + (col_shift)]
     target_col = col + (col_shift * 2)
-    case @map_matrix[row][target_col]
-    when WALL_CHAR then return false
-    when BOX_LEFT_CHAR, BOX_RIGHT_CHAR then move_boxes_horizontal?(row, target_col, col_shift, boxes_to_move)
-    else true
-    end
+    return false if @map_matrix[row][target_col] == WALL_CHAR
+
+    # Collect boxes to move
+    boxes_to_move << [row, col]
+    boxes_to_move << [row, col + col_shift]
+
+    # Recurse if there are more boxes horizontally
+    return (@map_matrix[row][target_col] == BOX_LEFT_CHAR || @map_matrix[row][target_col] == BOX_RIGHT_CHAR) ?
+            move_boxes_horizontal?(row, target_col, col_shift, boxes_to_move) : true
   end
 
-  def move_boxes_vertial?(row, col, direction, boxes_to_move, paired = false)
+  def move_boxes_vertical?(row, col, direction, boxes_to_move, paired = false)
     boxes_to_move << [row, col]
     box_char = @map_matrix[row][col]
     pair_shift = box_char == BOX_LEFT_CHAR ? 1 : -1
@@ -109,15 +111,15 @@ class WarehouseMap
       false
     when BOX_LEFT_CHAR, BOX_RIGHT_CHAR
       if paired
-        # Go to the next row if alredy paired
-        move_boxes_vertial?(target_row, col, direction, boxes_to_move)
+        # Continue with the next row if already paired
+        move_boxes_vertical?(target_row, col, direction, boxes_to_move)
       else
-        # Check next row and other box pair
-        move_boxes_vertial?(row, col + pair_shift, direction, boxes_to_move, true) &&
-             move_boxes_vertial?(target_row, col, direction, boxes_to_move)
+        # Pair the boxes and check the next row
+        move_boxes_vertical?(row, col + pair_shift, direction, boxes_to_move, true) &&
+          move_boxes_vertical?(target_row, col, direction, boxes_to_move)
       end
     else # space
-      paired || move_boxes_vertial?(row, col + pair_shift, direction, boxes_to_move, true)
+      paired || move_boxes_vertical?(row, col + pair_shift, direction, boxes_to_move, true)
     end
   end
 
