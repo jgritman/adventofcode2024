@@ -1,6 +1,6 @@
 require 'set'
 
-INPUT_FILENAME = 'sample_input.txt'
+INPUT_FILENAME = 'input.txt'
 
 # Constants for the maze
 START_CHAR = 'S'
@@ -113,5 +113,5 @@ File.readlines(INPUT_FILENAME).each_with_index do |line, row_idx|
   maze.add_row(line.strip.chars, row_idx)
 end
 
-puts maze.solve_with_dijkstra
+puts maze.solve
 
